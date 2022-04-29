@@ -20,6 +20,7 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "styled-components": "^5.3.5",
+    "twilio-chat": "^6.0.0",
     "twilio-client": "^1.14.0",
     "twilio-run": "^3.4.1",
     "twilio-video": "^2.21.1",
@@ -31,9 +32,7 @@
     "deploy": "react-scripts build && twilio serverless:deploy --service-name react-twilio-serverless --cwd serverless --assets-folder ../build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "react-scripts build && twilio serverless:start --assets-folder ../build",
-    "deve": "react-scripts build && mkdir build/assets && cp build/index.html build/assets && twilio serverless:start --assets-folder ../build"
-    
+    "dev": "react-scripts build && twilio serverless:start --cwd serverless --assets-folder ../build"
   },
   "eslintConfig": {
     "extends": [

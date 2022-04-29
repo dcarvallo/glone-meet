@@ -1,32 +1,47 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import GNavbar from './GNavbar';
-import {Button, Grid, TextField, Link } from '@mui/material';
+import {Button, Grid, TextField,CssBaseline, Link, Container } from '@mui/material';
 import WaitingRoom from './WaitingRoom';
 import ModalText from './ModalText';
+
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+
+const themeDark = createTheme({
+  palette: {
+    background: {
+      default: "#222222"
+    },
+    text: {
+      primary: "#ffffff"
+    }
+  }
+});
+
 const NewRoom = () => {
+
+  
+
 
   const { isAuthenticated, loginWithPopup } = useAuth0();
   const [createNewRoom, setCreateNewRoom] = useState(false)
   const [isInWaitingRoom, setIsInWaitingRoom] = useState(false);
+  const [selectNew, setSelectNew] = useState(false);
   const [open, setOpen]  = useState(false);
 
  
-  const handleNewRoom = async () => {
-    if(isAuthenticated) {
-      setCreateNewRoom(true)
-     } 
-     else{
-       loginWithPopup();
-       
-      }
-  }
+  const handleNewRoom = () => {
 
-  useEffect(() => {
-    console.log(isAuthenticated);
-    console.log('test')
-    isAuthenticated && setCreateNewRoom(true)
-  },[isAuthenticated])
+    setSelectNew(true)
+
+      if(isAuthenticated){
+        setCreateNewRoom(true)
+      }
+      else{
+        loginWithPopup();
+       }
+     
+  }
 
   const handleClose = () =>{
     setOpen(false)
@@ -34,12 +49,14 @@ const NewRoom = () => {
 
   return (
     <div>
-      <GNavbar />
+      <Container>
+        <GNavbar />
+      </Container>
       <ModalText handleClose={handleClose} open={open}>
         <p>Please Login first </p>
       </ModalText>
       { !createNewRoom ? 
-      <div >
+      <Container >
         <Grid
         alignItems="center"
         justifyContent="center"
@@ -72,9 +89,16 @@ const NewRoom = () => {
             </div>
           </Grid>
         </Grid>
-      </div>
+      </Container>
         :
-        <WaitingRoom />  
+        <ThemeProvider theme={themeDark}>
+          <CssBaseline>
+            <div>
+              <WaitingRoom />  
+            </div>
+          </CssBaseline>
+        </ThemeProvider>
+        
         }
     </div>
   );

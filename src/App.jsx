@@ -1,15 +1,12 @@
-import Container from '@mui/material/Container'
 import NewRoom from './components/NewRoom'
+
 function App() {
-  
   return (
-    <Container 
-    // maxWidth="sm"
-    >
-      <NewRoom />
-      {/* <WaitingRoom username='Daniel'/> */}
-      
-    </Container>
+    
+      <div>
+        
+          <NewRoom />
+      </div>
       
   );
 }
