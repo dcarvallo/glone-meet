@@ -15,8 +15,10 @@ import {
 import { Send } from "@mui/icons-material";
 import ChatItem from "./ChatItem";
 import { useAuth0 } from '@auth0/auth0-react';
+import { getChatToken } from "../scripts/getTokens";
 const Chat = require("twilio-chat");
 // import {Chat} from "twilio-chat";
+
 
 const ChatComponent = ({room}) => {
 
@@ -33,29 +35,13 @@ const ChatComponent = ({room}) => {
 
    useEffect( async () => {
      await llamada()
-   },[]) 
-
-   const getToken = async () => {
-     const response = await fetch('/get_token_chat?username='+user.name, {
-    //  const response = await fetch('/get_token_chat?username=room2', {
-     method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      // body: JSON.stringify('user.email')
-    });
-    const data = await response.json();
-    setToken(data.token)
-    return data.token;
-
-  };
+   },[]);
 
    const llamada = async () => {
-    // setLoading(true);
     let token2 = ""
     try {
-      token2 = await getToken();
-      // setToken(token2)
+      token2 = await getChatToken(user.name);
+      setToken(token2)
     } catch {
       throw new Error("Error, please reload this page");
     }
@@ -63,12 +49,12 @@ const ChatComponent = ({room}) => {
     const client = await Chat.Client.create(token2);
      
     client.on("tokenAboutToExpire", async () => {
-      const token = await getToken();
+      const token = await getChatToken(user.name);
       await client.updateToken(token);
     });
 
     client.on("tokenExpired", async () => {
-      const token = await getToken();
+      const token = await getChatToken(user.name);
       await client.updateToken(token);
     });
 
@@ -78,8 +64,6 @@ const ChatComponent = ({room}) => {
       scrollToBottom();
     });
 
-      
-      
     try {
       let channel2 = await client.getChannelByUniqueName(room);
       await joinChannel(channel2);
@@ -133,12 +117,12 @@ const ChatComponent = ({room}) => {
   };
 
     return (
-      <Container component="main" maxWidth="md">
+      <Container  maxWidth="xs">
         <Backdrop open={loading} style={{ zIndex: 999 }}>
           <CircularProgress style={{ color: "white" }} />
         </Backdrop>
-        <CssBaseline />
-        <Grid container direction="column" >
+        {/* <CssBaseline /> */}
+        <Grid direction="column" >
           <Grid item style={styles.gridItemChatList} ref={scrollDiv}>
             <List dense={true}>
               {chatMessages.length > 0 &&
@@ -183,7 +167,7 @@ const ChatComponent = ({room}) => {
                   onClick={sendMessage}
                   disabled={!channel || !text}
                 >
-                  <Send style={styles.sendIcon} />
+                  <Send />
                 </IconButton>
               </Grid>
             </Grid>
@@ -194,13 +178,14 @@ const ChatComponent = ({room}) => {
 }
 
 const styles = {
-  textField: { width: "100%", borderWidth: 0, borderColor: "transparent" },
+  // textField: { width: "100%", borderWidth: 0, borderColor: "transparent" },
+  textField: { width: "100%", color: "black"},
   textFieldContainer: { flex: 1, marginRight: 12 },
   gridItem: { paddingTop: 12, paddingBottom: 12 },
-  gridItemChatList: { overflow: "auto", height: "70vh" },
+  gridItemChatList: { overflow: "auto", height: "85vh" },
   gridItemMessage: { marginTop: 12, marginBottom: 12 },
-  sendButton: { backgroundColor: "#3f51b5" },
-  sendIcon: { color: "white" },
+  // sendButton: { backgroundColor: "#3f51b5" },
+  // sendIcon: { color: "white" },
   mainGrid: { paddingTop: 100, borderWidth: 1 },
 };
 

@@ -3,7 +3,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import GNavbar from './GNavbar';
 import {Button, Grid, TextField,CssBaseline, Link, Container } from '@mui/material';
 import WaitingRoom from './WaitingRoom';
-import ModalText from './ModalText';
 
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 
@@ -20,41 +19,62 @@ const themeDark = createTheme({
 
 const NewRoom = () => {
 
-  
-
 
   const { isAuthenticated, loginWithPopup } = useAuth0();
   const [createNewRoom, setCreateNewRoom] = useState(false)
-  const [isInWaitingRoom, setIsInWaitingRoom] = useState(false);
   const [selectNew, setSelectNew] = useState(false);
+  const [roomName, setRoomName] =useState(localStorage.getItem('room') || '')
   const [open, setOpen]  = useState(false);
 
+  useEffect(() => {
+    let local = localStorage.getItem('room');
+    if( local &&  isAuthenticated ){
+      console.log('testets',localStorage.getItem('room'))
+      setSelectNew(true)
+      setCreateNewRoom(true)
+    }
+    
+  },[ isAuthenticated ])
  
   const handleNewRoom = () => {
-
+    const room = createRandomRoom()
+    setRoomName(room)
     setSelectNew(true)
 
       if(isAuthenticated){
+        localStorage.setItem('room', room)
         setCreateNewRoom(true)
       }
       else{
         loginWithPopup();
        }
-     
   }
 
   const handleClose = () =>{
     setOpen(false)
   }
 
+  const joinRoom = (e) => {
+    if (e.key === 'Enter') {
+      setSelectNew(true)
+      localStorage.setItem('room', roomName)
+      isAuthenticated ? setCreateNewRoom(true) : loginWithPopup();
+    }
+  }
+
+  const createRandomRoom = () => {
+    let data = Math.random().toString(36).replace(/[^a-z0-9]+/gi, 'g').substring(1, 10)     
+    let tes = data.split('')
+    tes.splice(3,0,'-')
+    tes.splice(7,0,'-')
+    return tes.join(''); 
+   }
+
   return (
     <div>
       <Container>
         <GNavbar />
       </Container>
-      <ModalText handleClose={handleClose} open={open}>
-        <p>Please Login first </p>
-      </ModalText>
       { !createNewRoom ? 
       <Container >
         <Grid
@@ -70,10 +90,10 @@ const NewRoom = () => {
               <h2>Videoconferencias premium. Ahora gratis para todos.</h2>
               <p>Rediseñamos Google Meet, nuestro servicio de reuniones de negocios seguras, de modo que sea gratuito y esté desponible para todos.</p>
             </div>
-            <div style={{ display: 'flex',gap: "10px" }}>
+            <div xs={{flexDirection: 'column'}} style={{ display: 'flex',gap: "10px" }}>
               <Button style={{ minWidth: '160px'}} onClick={handleNewRoom} variant='contained'>Reunión nueva</Button>
               
-              <TextField fullWidth label="Ingresa un código o un vínculo" id="fullWidth" />
+              <TextField fullWidth onChange={(e) => setRoomName(e.target.value)} onKeyDown={joinRoom} label="Ingresa un código o un vínculo" id="fullWidth" />
             </div>
             <p><Link  href="">Más información</Link > sobre google meet</p>
           </Grid>
@@ -94,7 +114,7 @@ const NewRoom = () => {
         <ThemeProvider theme={themeDark}>
           <CssBaseline>
             <div>
-              <WaitingRoom />  
+              <WaitingRoom roomName={roomName}/>  
             </div>
           </CssBaseline>
         </ThemeProvider>

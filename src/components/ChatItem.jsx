@@ -26,9 +26,9 @@ const styles = {
     alignItems: isOwnMessage ? "flex-end" : "flex-start",
   }),
   container: (isOwnMessage) => ({
-    maxWidth: "75%",
-    borderRadius: 12,
-    padding: 16,
+    maxWidth: "100%",
+    borderRadius: 8,
+    padding: 8,
     color: "white",
     fontSize: 12,
     backgroundColor: isOwnMessage ? "#054740" : "#262d31",

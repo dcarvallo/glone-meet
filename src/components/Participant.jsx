@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const Participant = ({ participant }) => {
+const Participant = ({ participant, videoToogle, audioToogle }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
+  
 
   const videoRef = useRef();
   const audioRef = useRef();
@@ -13,17 +14,19 @@ const Participant = ({ participant }) => {
       .filter((track) => track !== null);
 
   useEffect(() => {
-    setVideoTracks(trackpubsToTracks(participant.videoTracks));
-    setAudioTracks(trackpubsToTracks(participant.audioTracks));
+      setVideoTracks(trackpubsToTracks(participant.videoTracks));
+      setAudioTracks(trackpubsToTracks(participant.audioTracks));
+    
 
     const trackSubscribed = (track) => {
       if (track.kind === "video") {
+        console.log('algo cambio')
         setVideoTracks((videoTracks) => [...videoTracks, track]);
       } else if (track.kind === "audio") {
         setAudioTracks((audioTracks) => [...audioTracks, track]);
       }
     };
-
+      
     const trackUnsubscribed = (track) => {
       if (track.kind === "video") {
         setVideoTracks((videoTracks) => videoTracks.filter((v) => v !== track));
@@ -64,9 +67,13 @@ const Participant = ({ participant }) => {
 
   return (
     <div className="participant">
-      <h5 style={{margin: "0"}}>{participant.identity}</h5>
-      <video ref={videoRef} style={{ width:"100%", height:"150px", objectFit: "cover", borderRadius:"10px"}} autoPlay={true} />
-      <audio ref={audioRef} autoPlay={true} muted={true} />
+      {/* <h5 style={{margin: "0"}}>{participant.identity}</h5> */}
+      <div style={{position:'relative'}} sx={{width: '200px'}}>
+        <video ref={videoRef} style={{ width: '100%', height:"150px", objectFit: "cover", position: 'relative',borderRadius:"10px"}} autoPlay={true} />
+        <p style={{position: 'absolute', left: '5px', bottom: '-8px', zIndex:'9'}} >{participant.identity}</p>
+      </div>
+      <audio ref={audioRef} autoPlay={true} muted={false} />
+      
     </div>
   );
 };

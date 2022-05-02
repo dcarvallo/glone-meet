@@ -5,7 +5,7 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-const ModalText = ({open, handleClose, children}) => {
+const ModalView = ({openModal, setOpenModal, children}) => {
   const style = {
     position: 'absolute',
     top: '50%',
@@ -22,15 +22,15 @@ const ModalText = ({open, handleClose, children}) => {
     <Modal
       aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
-        open={open}
-        onClose={handleClose}
+        open={openModal}
+        onClose={setOpenModal}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
     >
-      <Fade in={open}>
+      <Fade in={openModal}>
           <Box sx={style}>
             <Typography id="transition-modal-title" variant="h6" component="h2">
               Note
@@ -44,4 +44,4 @@ const ModalText = ({open, handleClose, children}) => {
   )
 }
 
-export default ModalText
+export default ModalView
