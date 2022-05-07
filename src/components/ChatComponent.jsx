@@ -1,16 +1,12 @@
 import {useState, useEffect, useRef} from "react";
 import {
-  AppBar,
   Backdrop,
   CircularProgress,
   Container,
-  CssBaseline,
   Grid,
   IconButton,
   List,
   TextField,
-  Toolbar,
-  Typography,
 } from "@mui/material";
 import { Send } from "@mui/icons-material";
 import ChatItem from "./ChatItem";
@@ -33,8 +29,9 @@ const ChatComponent = ({room}) => {
   const scrollDiv = useRef(null)
 
 
-   useEffect( async () => {
-     await llamada()
+   useEffect( () => {
+     console.log('desde chatcomponent')
+     llamada()
    },[]);
 
    const llamada = async () => {
@@ -68,8 +65,6 @@ const ChatComponent = ({room}) => {
       let channel2 = await client.getChannelByUniqueName(room);
       await joinChannel(channel2);
       setChannel(channel2)
-      console.log('recupera bien')
-      // setLoading(false)
     } catch {
       try {
         let channel3 = await client.createChannel({
@@ -79,7 +74,6 @@ const ChatComponent = ({room}) => {
         
         await joinChannel(channel3);
         setChannel(channel3)
-        // setLoading(false)
       } catch {
         throw new Error("unable to create channel, please reload this page");
       }
@@ -110,8 +104,6 @@ const ChatComponent = ({room}) => {
   const sendMessage = async () => {
     if (text && String(text).trim()) {
       channel && channel.sendMessage(text);
-    //   const data = await channel.getMessages()
-    // setChatMessages(data.items)
       setText('')
     }
   };
@@ -132,10 +124,6 @@ const ChatComponent = ({room}) => {
                     message={message}
                     email={user.email}
                   />
-                  // <>
-                  // <p>{message.author}</p>
-                  // <p>{message.body}</p>
-                  // </>
                 ))}
             </List>
           </Grid>

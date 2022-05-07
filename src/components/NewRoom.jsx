@@ -25,11 +25,11 @@ const NewRoom = () => {
   const [selectNew, setSelectNew] = useState(false);
   const [roomName, setRoomName] =useState(localStorage.getItem('room') || '')
   const [open, setOpen]  = useState(false);
+  const [roomOwner, setRoomOwner] = useState(false);
 
   useEffect(() => {
     let local = localStorage.getItem('room');
     if( local &&  isAuthenticated ){
-      console.log('testets',localStorage.getItem('room'))
       setSelectNew(true)
       setCreateNewRoom(true)
     }
@@ -37,21 +37,18 @@ const NewRoom = () => {
   },[ isAuthenticated ])
  
   const handleNewRoom = () => {
-    const room = createRandomRoom()
+    const room = 'tt'
     setRoomName(room)
     setSelectNew(true)
 
       if(isAuthenticated){
         localStorage.setItem('room', room)
+        setRoomOwner(true)
         setCreateNewRoom(true)
       }
       else{
         loginWithPopup();
        }
-  }
-
-  const handleClose = () =>{
-    setOpen(false)
   }
 
   const joinRoom = (e) => {
@@ -60,6 +57,11 @@ const NewRoom = () => {
       localStorage.setItem('room', roomName)
       isAuthenticated ? setCreateNewRoom(true) : loginWithPopup();
     }
+  }
+  function clickJoin(){
+    setSelectNew(true)
+    localStorage.setItem('room', roomName)
+    isAuthenticated ? setCreateNewRoom(true) : loginWithPopup();
   }
 
   const createRandomRoom = () => {
@@ -72,11 +74,12 @@ const NewRoom = () => {
 
   return (
     <div>
-      <Container>
-        <GNavbar />
-      </Container>
+      
       { !createNewRoom ? 
       <Container >
+        <Container>
+          <GNavbar />
+        </Container>
         <Grid
         alignItems="center"
         justifyContent="center"
@@ -91,7 +94,7 @@ const NewRoom = () => {
               <p>Rediseñamos Google Meet, nuestro servicio de reuniones de negocios seguras, de modo que sea gratuito y esté desponible para todos.</p>
             </div>
             <div xs={{flexDirection: 'column'}} style={{ display: 'flex',gap: "10px" }}>
-              <Button style={{ minWidth: '160px'}} onClick={handleNewRoom} variant='contained'>Reunión nueva</Button>
+              <Button  style={roomName.length !== 0 ? { minWidth: '160px'}: {minWidth: '160px',backgroundColor: 'green' }} onClick={roomName.length !== 0 ? clickJoin : handleNewRoom} variant='contained'> {roomName.length !== 0 ? "Unirse" : "Reunión nueva"}</Button>
               
               <TextField fullWidth onChange={(e) => setRoomName(e.target.value)} onKeyDown={joinRoom} label="Ingresa un código o un vínculo" id="fullWidth" />
             </div>
@@ -114,7 +117,7 @@ const NewRoom = () => {
         <ThemeProvider theme={themeDark}>
           <CssBaseline>
             <div>
-              <WaitingRoom roomName={roomName}/>  
+              <WaitingRoom roomName={roomName} roomOwner={roomOwner}/>  
             </div>
           </CssBaseline>
         </ThemeProvider>

@@ -4,7 +4,6 @@ exports.handler = async function (context, event, callback) {
   
   const { ACCOUNT_SID, API_KEY_SID, API_KEY_SECRET, TWILIO_CHAT_SERVICE_SID } = context
 
-  console.log(event.username)
   const accessToken = new twilio.jwt.AccessToken(ACCOUNT_SID, API_KEY_SID, API_KEY_SECRET)
  
   accessToken.identity = event.username

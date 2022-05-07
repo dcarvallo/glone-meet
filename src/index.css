@@ -55,6 +55,7 @@ code {
   background-color: white;
   padding: 8px;
   border-radius: 5px;
+  cursor: pointer;
   transition: transform .3s ease;
 }
 
@@ -65,7 +66,26 @@ code {
 button{
   text-transform: "none"
 }
-/* 
-#room{
-  background-color: black;
-} */
+
+.viewSelection{
+  border: '2px solid';
+  border-color: 'green';
+  cursor: 'pointer';
+  width: '600px';
+  animation-name: zoom;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+
+}
+
+@keyframes zoom{
+  0%{
+    transform: scale(1);
+  }
+  50%{
+    transform: scale(1.05)
+  }
+  100%{
+    transform: scale(1);
+  }
+}

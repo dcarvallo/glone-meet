@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import Box from '@mui/material/Box';
 
 const Participant = ({ participant, videoToogle, audioToogle }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   
-
   const videoRef = useRef();
   const audioRef = useRef();
 
@@ -20,7 +20,6 @@ const Participant = ({ participant, videoToogle, audioToogle }) => {
 
     const trackSubscribed = (track) => {
       if (track.kind === "video") {
-        console.log('algo cambio')
         setVideoTracks((videoTracks) => [...videoTracks, track]);
       } else if (track.kind === "audio") {
         setAudioTracks((audioTracks) => [...audioTracks, track]);
@@ -67,11 +66,10 @@ const Participant = ({ participant, videoToogle, audioToogle }) => {
 
   return (
     <div className="participant">
-      {/* <h5 style={{margin: "0"}}>{participant.identity}</h5> */}
-      <div style={{position:'relative'}} sx={{width: '200px'}}>
+      <Box style={{width:'250px', position:'relative', borderRadius: '10px', backgroundColor: "#585858", padding: '4px 4px 0 3px'}} sx={{width: '250px'}}>
         <video ref={videoRef} style={{ width: '100%', height:"150px", objectFit: "cover", position: 'relative',borderRadius:"10px"}} autoPlay={true} />
-        <p style={{position: 'absolute', left: '5px', bottom: '-8px', zIndex:'9'}} >{participant.identity}</p>
-      </div>
+        <p style={{position: 'absolute', left: '5px', bottom: '-8px', zIndex:'9'}} >{JSON.parse(participant.identity).name}</p>
+      </Box>
       <audio ref={audioRef} autoPlay={true} muted={false} />
       
     </div>

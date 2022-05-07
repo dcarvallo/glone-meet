@@ -23,17 +23,23 @@ const ModalView = ({openModal, setOpenModal, children}) => {
       aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openModal}
-        onClose={setOpenModal}
+        onClose={() => setOpenModal(false)}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
+        PaperProps={{
+          style: {
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+          },
+        }}
     >
       <Fade in={openModal}>
           <Box sx={style}>
             <Typography id="transition-modal-title" variant="h6" component="h2">
-              Note
+              
             </Typography>
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
               {children}
