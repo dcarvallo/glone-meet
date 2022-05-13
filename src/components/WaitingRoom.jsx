@@ -446,7 +446,7 @@ function sendDataToRoom(data){
     // setParticipants(prev => {
     //   prev.unshift(room.localParticipant); 
     //   return prev
-    })
+    // })
     
     const track2 = await createLocalVideoTrack()
     setVideoTrack(track2)
