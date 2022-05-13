@@ -42,7 +42,7 @@ const grids = [
   {id: 2, src: '//www.gstatic.com/meet/layout_v2_tiled_b81dc04cf1f16260f8dc9b727c03a14e.svg', selected: false},
   // {id: 3, src: '//www.gstatic.com/meet/layout_v2_fullscreen_9175b2e94ac960de3a29a4c5e4c32ab6.svg', selected: false},
 ]
-const WaitingRoom = ({ roomOwner, roomName}) => {
+const MainRoom = ({ roomOwner, roomName}) => {
   
   const enterAudio = useRef(null)
   const leaveAudio = useRef(null)
@@ -157,25 +157,6 @@ function sendDataToRoom(data){
       //     room2.on('participantConnected', participantConnected)
       //     room2.on('participantDisconnected', participantDisconnected)
       //     setRoom(room2)
-          
-      //     updateParticipantCount()
-      //     setConnected(true)
-      //     enterAudio.current.play();
-      //     console.log({room2})
-      //   },
-      //   async () => {
-      //     room2 = await Video.connect(token,{video : false})
-      //     room2.participants.forEach(participantConnected)
-      //     room2.on('participantConnected', participantConnected)
-      //     room2.on('participantDisconnected', participantDisconnected)
-      //     setRoom(room2)
-          
-      //     updateParticipantCount()
-      //     setConnected(true)
-      //     enterAudio.current.play();
-          
-      //   }
-      // );
 
       // room2 = await Video.connect(supToken,{video : false, dominantSpeaker: true})
       room2 = await Video.connect(supToken, {dominantSpeaker: true})
@@ -216,6 +197,7 @@ function sendDataToRoom(data){
           track.on('message', async data => {
             let temp = JSON.parse(data)
             
+            console.log('hacealgo?')
             
             if(temp.personalMic){
               setMicsOff(prev => prev.includes(temp.sid) ?  prev.filter(el => el !== temp.sid) : [...prev, temp.sid])
@@ -281,20 +263,34 @@ function sendDataToRoom(data){
   }
   
   function participantConnected (participant) {
-    roomOwner && setOpenModalParticipant(true)
+
     let usdata = JSON.parse(participant.identity)
-    if(usdata.roomOwner) {
-      setParticipants(prev => [...prev, participant])
+    if(!usdata.name.includes('(share)')){
+
+      roomOwner && setOpenModalParticipant(true)
+      if(usdata.roomOwner) {
+        setParticipants(prev => [...prev, participant])
+      }
+      setNewParticipant(prev => [...prev, participant])
     }
-    setNewParticipant(prev => [...prev, participant])
+    else acceptParticipant(participant)
   }
 
   function acceptParticipant(participant) {
       enterAudio.current.play();
-      dataTrack.send(JSON.stringify({
-        connect: true,
-        sid: participant.sid
-      }));
+      console.log({participant})
+      const localDataTrack = new Video.LocalDataTrack();
+      if(dataTrack){
+        dataTrack.send(JSON.stringify({
+          connect: true,
+          sid: participant.sid
+        }));
+      }else {
+        localDataTrack.send(JSON.stringify({
+          connect: true,
+          sid: participant.sid
+        }));
+      }
       setParticipants(prev => [...prev, participant])
       setNewParticipant(prevParticipants => prevParticipants.filter((p) => p !== participant))
   }
@@ -336,6 +332,7 @@ function sendDataToRoom(data){
     navigator.mediaDevices.getDisplayMedia().then( async (stream) => {
       screenTrack = new Video.LocalVideoTrack(stream.getTracks()[0]);
       room2 = room.localParticipant.publishTrack(screenTrack);
+      console.log(roomName)
       let token = await getRoomToken({username: JSON.stringify({name: user.name + ' (share)', roomOwner: false}), roomName})
       Video.connect(token, {dominantSpeaker: true, tracks: [screenTrack]})
       enterAudio.current.play();
@@ -441,13 +438,7 @@ function sendDataToRoom(data){
     videoTrack.stop()
     setGridViewSelected(id)
     setGridView(prev => prev.map( el => el.id == id ? {...el, selected : true} : {...el, selected : false} ))
-    //esto agregue... cuidado
-    
-    // setParticipants(prev => {
-    //   prev.unshift(room.localParticipant); 
-    //   return prev
-    // })
-    
+        
     const track2 = await createLocalVideoTrack()
     setVideoTrack(track2)
     track2.attach(localVideo.current)
@@ -608,9 +599,9 @@ function sendDataToRoom(data){
       setOptionsOpen={setOptionsOpen}
     />
   </div> }
-  <Box style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginInline: '40px'}}>
-    <Box style={{display: 'flex', alignItems:'center'}}>
-      <Typography>{count} online users in - </Typography>
+  <Box style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+    <Box style={{display: 'flex', alignItems:'center', margin: '0 15px 0 15px'}}>
+      <Typography>{count} online users in Room - </Typography>
       <Tooltip title="Copy to Clipboard"><button style={{padding: '1px'}} id="gbutton" variant='outlined' onClick={copyToClipboard}>{roomName}</button></Tooltip>
     </Box>
     <Clock />
@@ -653,8 +644,6 @@ function sendDataToRoom(data){
       </Backdrop>
     </Box>
   );
-
-
 };
 
-export default WaitingRoom
+export default MainRoom

@@ -57,7 +57,7 @@ const SidebarParticipants = ({isOwner, openParticipants,setOpenParticipants,part
               {/* <CssBaseline /> */}
               {isOwner && 
               JSON.parse(isOwner.localParticipant.identity).roomOwner && 
-              <Button variant='contained' onClick={disableMics}>Disable Mics</Button>}
+              <Button  variant='contained' style={{margin: '5px'}} dense onClick={disableMics}>Disable Mics</Button>}
               <TextField
                 required
                 style={styles.textField}
@@ -89,8 +89,8 @@ const SidebarParticipants = ({isOwner, openParticipants,setOpenParticipants,part
                         }>
                           <Box style={styles.data}>
 
-                            {raiseHand.length > 0 && raiseHand.includes(participant.sid) && <IconButton style={{backgroundColor: 'transparent', color: 'yellow'}} ><PanToolIcon /> </IconButton> }
-                            {micsOff.length > 0 && micsOff.includes(participant.sid) && <IconButton style={{color: 'white'}} ><MicOffIcon /> </IconButton> }
+                            {raiseHand.length > 0 && raiseHand.includes(participant.sid) && <IconButton style={{backgroundColor: 'black', color: 'yellow'}} ><PanToolIcon /> </IconButton> }
+                            {micsOff.length > 0 && micsOff.includes(participant.sid) && <IconButton style={{color: 'red'}} ><MicOffIcon /> </IconButton> }
                             <Typography>{data.name}</Typography> 
                           </Box>
                         </ListItem>

@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import GNavbar from './utils/GNavbar';
 import {Button, Grid, TextField,CssBaseline, Link, Container } from '@mui/material';
-import WaitingRoom from './WaitingRoom';
+import MainRoom from './MainRoom';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -36,9 +36,8 @@ const NewRoom = () => {
   },[ isAuthenticated ])
  
   const handleNewRoom = () => {
+    // const room = createRandomRoom()
     const room = 'tt'
-   
-    // setSelectNew(true)
 
       if(isAuthenticated){
         localStorage.setItem('room', room)
@@ -122,7 +121,7 @@ const NewRoom = () => {
         <ThemeProvider theme={themeDark}>
           <CssBaseline>
             <div>
-              <WaitingRoom roomName={roomName} roomOwner={roomOwner}/>  
+              <MainRoom roomName={roomName} roomOwner={roomOwner}/>  
             </div>
           </CssBaseline>
         </ThemeProvider>

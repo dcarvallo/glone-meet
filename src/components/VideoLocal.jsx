@@ -1,10 +1,7 @@
-import { useAuth0 } from "@auth0/auth0-react"
-import { Box } from "@mui/system"
+
 import EmojiReaction from "./EmojiReaction"
 
 const VideoLocal = ({user,handleFullScreen, localVideo, videoToogle,emojisUser,setEmojisUser, localAudio,micToogle,height}) => {
-
-  console.log(localVideo)
 
   return (
     <div id="local" className="participant">

@@ -11,7 +11,7 @@ const NewParticipantDIalog = ({openModalParticipant,participant,newParticipant, 
         aria-describedby="alert-dialog-description"
       >
           <DialogTitle>
-            New Participant
+            <Typography style={{color: 'black'}}> New Participant</Typography>
           </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
