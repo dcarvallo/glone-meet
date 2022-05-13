@@ -16,11 +16,11 @@ exports.handler = async function (context, event, callback) {
 
   } catch (error) {
     console.log(error)
-    const response = new twilio.Response();
-    response.setBody({
+    // const response = new twilio.Response();
+    const response = {
       message: 'Unable to disconnect',
       error: error
-    });
+    };
     return callback(null, response);
   }
 

@@ -12,8 +12,8 @@ const GNavbar = () => {
   
   return (
     <div id='navbar'>
-      <Typography >C-Google-Meet</Typography >
-      <div>
+      <Typography >Glone-Meet</Typography >
+      <div style={{display: 'flex'}}>
         { isAuthenticated && 
         <div id='username'>
           <Avatar src={user.picture} />

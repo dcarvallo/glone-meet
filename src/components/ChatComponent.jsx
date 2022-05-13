@@ -13,7 +13,6 @@ import ChatItem from "./ChatItem";
 import { useAuth0 } from '@auth0/auth0-react';
 import { getChatToken } from "../scripts/getTokens";
 const Chat = require("twilio-chat");
-// import {Chat} from "twilio-chat";
 
 
 const ChatComponent = ({room}) => {
@@ -38,7 +37,7 @@ const ChatComponent = ({room}) => {
     let token2 = ""
     try {
       token2 = await getChatToken(user.name);
-      setToken(token2)
+      // setToken(token2)
     } catch {
       throw new Error("Error, please reload this page");
     }
@@ -172,8 +171,6 @@ const styles = {
   gridItem: { paddingTop: 12, paddingBottom: 12 },
   gridItemChatList: { overflow: "auto", height: "85vh" },
   gridItemMessage: { marginTop: 12, marginBottom: 12 },
-  // sendButton: { backgroundColor: "#3f51b5" },
-  // sendIcon: { color: "white" },
   mainGrid: { paddingTop: 100, borderWidth: 1 },
 };
 

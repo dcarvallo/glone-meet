@@ -54,8 +54,6 @@ const SideBar = ({open,setOpen,room, setShowBadge}) => {
 
    const client = await Chat.Client.create(token2);
 
-   console.log({client})
-    
    client.on("tokenAboutToExpire", async () => {
      const token = await getChatToken(user.name);
      await client.updateToken(token);
@@ -101,8 +99,6 @@ const SideBar = ({open,setOpen,room, setShowBadge}) => {
 
  const handleMessageAdded =  (message) => {
    setChatMessages(messages =>[...messages, message])
-   console.log('nuevo mensaje de chat')
-   
    setShowBadge(false)
    scrollToBottom();
  };
@@ -117,11 +113,14 @@ const SideBar = ({open,setOpen,room, setShowBadge}) => {
     }
  };
 
- const sendMessage = async () => {
-   if (text && String(text).trim()) {
-     channel && channel.sendMessage(text);
-     setText('')
-   }
+ const sendMessage = async (e) => {
+   if(e.type == 'click' || e.key === 'Enter') {
+
+     if (text && String(text).trim()) {
+       channel && channel.sendMessage(text);
+       setText('')
+      }
+    }
  };
 
   const toggleSlider = () => {
@@ -136,7 +135,7 @@ const SideBar = ({open,setOpen,room, setShowBadge}) => {
         <Drawer open={open} anchor="right" onClose={toggleSlider}>
           
             <Box>
-            <Typography>
+            <Typography align="center" padding={2}>
               Chat
             </Typography>
             <Divider />
@@ -147,15 +146,18 @@ const SideBar = ({open,setOpen,room, setShowBadge}) => {
               {/* <CssBaseline /> */}
               <Grid maxWidth="xs" direction="column" >
                 <Grid item style={styles.gridItemChatList} ref={scrollDiv}>
-                  <List dense={true}>
-                    {chatMessages.length > 0 &&
+                  <List dense={true} ref={scrollDiv}>
+                    {chatMessages.length > 0 ?
                       chatMessages.map(message => (
                         <ChatItem
                           key={message.index}
                           message={message}
                           email={user.email}
                         />
-                      ))}
+                      ))
+                    :
+                    <Typography align="center" variant="caption"> No messages</Typography>
+                    }
                   </List>
                 </Grid>
                 <Grid item >
@@ -171,13 +173,14 @@ const SideBar = ({open,setOpen,room, setShowBadge}) => {
                         style={styles.textField}
                         placeholder="Enter message"
                         variant="outlined"
-                        multiline
-                        rows={2}
+                        // multiline
+                        // rows={2}
                         value={text}
                         disabled={!channel}
                         onChange={(event) =>
                         setText(event.target.value)
                         }
+                        onKeyDown={sendMessage}
                       />
                     </Grid>
                     <Grid item>
@@ -206,7 +209,7 @@ const styles = {
   textField: { width: "100%", color: "black"},
   textFieldContainer: { flex: 1, marginRight: 5 },
   gridItem: { paddingTop: 12, paddingBottom: 12, maxWidth: '100%' },
-  gridItemChatList: { overflow: "auto", height: "82vh" },
+  gridItemChatList: { overflow: "auto", height: "78vh" },
   gridItemMessage: { marginTop: 12, marginBottom: 12 },
   // sendButton: { backgroundColor: "#3f51b5" },
   // sendIcon: { color: "white" },

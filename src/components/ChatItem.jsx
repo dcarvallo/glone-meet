@@ -1,11 +1,10 @@
 import React from 'react'
 import { ListItem } from "@mui/material";
 
-class ChatItem extends React.Component {
-  render() {
-    const { message, email } = this.props;
+const ChatItem = ({message, email}) => {
+  
     const isOwnMessage = message.author === email;
-
+    console.log('message', message)
     return (
       <ListItem style={styles.listItem(isOwnMessage)}>
         <div style={styles.author}>{message.author}</div>
@@ -17,7 +16,7 @@ class ChatItem extends React.Component {
         </div>
       </ListItem>
     );
-  }
+
 }
 
 const styles = {
