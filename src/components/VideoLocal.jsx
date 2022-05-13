@@ -6,8 +6,8 @@ const VideoLocal = ({user,handleFullScreen, localVideo, videoToogle,emojisUser,s
   return (
     <div id="local" className="participant">
       
-        <video onDoubleClick={handleFullScreen} ref={localVideo}  style={{ height, width: '100%' , objectFit: "cover", borderRadius:"7px", position: 'relatve'}} autoPlay={videoToogle} />
-        <p style={{position: 'absolute', bottom: '-15px', zIndex:'9'}} >{user.name}</p>
+        <video onDoubleClick={handleFullScreen} ref={localVideo}  style={{ height, width: '100%' , objectFit: "cover", borderRadius:"7px", position: 'relative'}} autoPlay={videoToogle} />
+        <p style={{position: 'absolute', bottom: '0px', left: '45%', zIndex:'9'}} >{user.name}</p>
           
           { emojisUser.length > 0 && emojisUser.map((reaction,index) => {
           let time = setTimeout(() => {

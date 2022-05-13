@@ -57,7 +57,7 @@ const SidebarParticipants = ({isOwner, openParticipants,setOpenParticipants,part
               {/* <CssBaseline /> */}
               {isOwner && 
               JSON.parse(isOwner.localParticipant.identity).roomOwner && 
-              <Button  variant='contained' style={{margin: '5px'}} dense onClick={disableMics}>Disable Mics</Button>}
+              <Button disabled={participants.length === 0} variant='contained' style={{margin: '5px'}} dense onClick={disableMics}>Disable Mics</Button>}
               <TextField
                 required
                 style={styles.textField}

@@ -29,10 +29,10 @@ const DisconnectModal = ({openModal, setOpenModal, disconnectAll, disconnect}) =
       <Fade in={openModal}>
           <Box sx={style}>
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              <Typography color="black"> Quieres finalizar la llamada? </Typography>
+              <Typography color="black"> You want to end the meeting? </Typography>
               <Box dense style={{display:'flex', gap: '5px'}}>
-                <Button size="small" onClick={disconnect}>Abandonar la llamada</Button>
-                <Button size="small" color="secondary" onClick={disconnectAll}>Finalizar la llamada para todos</Button>
+                <Button size="small" onClick={disconnect}>Leave the room</Button>
+                <Button size="small" color="secondary" onClick={disconnectAll}>Finish for everyone</Button>
               </Box>
             </Typography>
           </Box>

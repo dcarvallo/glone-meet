@@ -29,7 +29,6 @@ const ChatComponent = ({room}) => {
 
 
    useEffect( () => {
-     console.log('desde chatcomponent')
      llamada()
    },[]);
 

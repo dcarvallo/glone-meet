@@ -109,7 +109,7 @@ const MainRoom = ({ roomOwner, roomName}) => {
       console.error(e)
       localStorage.removeItem('room')
       localStorage.removeItem('twilio-token')
-      alert('Failed to connect')
+      alert('Failed, connect a camera')
       room.disconnect();
       window.location.reload()
     }
@@ -117,6 +117,7 @@ const MainRoom = ({ roomOwner, roomName}) => {
 
   function addLocalData() {
     const localDataTrack = new Video.LocalDataTrack();
+
     otro = localDataTrack
     setDataTrack(localDataTrack);
 };
@@ -157,10 +158,10 @@ function sendDataToRoom(data){
       //     room2.on('participantConnected', participantConnected)
       //     room2.on('participantDisconnected', participantDisconnected)
       //     setRoom(room2)
+      // })
 
       // room2 = await Video.connect(supToken,{video : false, dominantSpeaker: true})
       room2 = await Video.connect(supToken, {dominantSpeaker: true})
-      console.log(room2.localParticipant)
       setRoom(room2)
       room2.localParticipant.publishTrack(otro);
       room2.on('participantConnected',participantConnected)
@@ -197,8 +198,6 @@ function sendDataToRoom(data){
           track.on('message', async data => {
             let temp = JSON.parse(data)
             
-            console.log('hacealgo?')
-            
             if(temp.personalMic){
               setMicsOff(prev => prev.includes(temp.sid) ?  prev.filter(el => el !== temp.sid) : [...prev, temp.sid])
             }
@@ -227,7 +226,6 @@ function sendDataToRoom(data){
               }
 
               if(room2.localParticipant.sid == temp.sid){
-                console.log('here its ok')
                 let arrParticipants = []
                 room2.participants.forEach(participant => {
                   arrParticipants.push(participant)
@@ -243,6 +241,7 @@ function sendDataToRoom(data){
           });
         }
       });
+      
       addLocalVideo()
       JSON.parse(room2.localParticipant.identity).roomOwner && setIsConnected(true)
       isConnected && enterAudio.current.play();
@@ -278,7 +277,6 @@ function sendDataToRoom(data){
 
   function acceptParticipant(participant) {
       enterAudio.current.play();
-      console.log({participant})
       const localDataTrack = new Video.LocalDataTrack();
       if(dataTrack){
         dataTrack.send(JSON.stringify({
@@ -332,7 +330,6 @@ function sendDataToRoom(data){
     navigator.mediaDevices.getDisplayMedia().then( async (stream) => {
       screenTrack = new Video.LocalVideoTrack(stream.getTracks()[0]);
       room2 = room.localParticipant.publishTrack(screenTrack);
-      console.log(roomName)
       let token = await getRoomToken({username: JSON.stringify({name: user.name + ' (share)', roomOwner: false}), roomName})
       Video.connect(token, {dominantSpeaker: true, tracks: [screenTrack]})
       enterAudio.current.play();
@@ -430,6 +427,8 @@ function sendDataToRoom(data){
 
   function handleFullScreen(){
     setFullScreenToogle(prev => !prev)
+    console.log(fullScreenToogle)
+    console.log(document.fullscreenElement)
     fullScreenToogle && document.fullscreenElement ? document.exitFullscreen() : mainDiv.current.requestFullscreen()
     setOptionsOpen({...optionsOpen, open: false})
   }
@@ -456,7 +455,6 @@ function sendDataToRoom(data){
     setOptionsOpen({...optionsOpen, open: !optionsOpen.open, anchorEl: event.currentTarget})
   }
   async function copyToClipboard(event) {
-    console.log(event)
     if ('clipboard' in navigator) {
       return await navigator.clipboard.writeText(event.target.textContent);
     } else {
@@ -602,10 +600,10 @@ function sendDataToRoom(data){
   <Box style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
     <Box style={{display: 'flex', alignItems:'center', margin: '0 15px 0 15px'}}>
       <Typography>{count} online users in Room - </Typography>
-      <Tooltip title="Copy to Clipboard"><button style={{padding: '1px'}} id="gbutton" variant='outlined' onClick={copyToClipboard}>{roomName}</button></Tooltip>
+      <Tooltip title="Copy to Clipboard"><button style={{padding: '4px', fontSize: '17px'}} id="gbutton" onClick={copyToClipboard}>{roomName}</button></Tooltip>
     </Box>
-    <Clock />
-    <Box style={{display: 'flex', gap: '7px'}}>
+    {/* <Clock /> */}
+    <Box style={{display: 'flex', gap: '7px', marginRight:'15px'}}>
       <Tooltip title="Chat"><IconButton style={{backgroundColor: 'white'}} onClick={showChats}><Badge color="primary" variant="dot" badgeContent=" " invisible={showBadge} ><ChatIcon /></Badge></IconButton></Tooltip>
       <Tooltip title="Participants"><IconButton style={{backgroundColor: 'white'}} onClick={() => setOpenParticipants(true)}>{ <PeopleIcon />}</IconButton></Tooltip>
     </Box>
