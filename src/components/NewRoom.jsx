@@ -36,8 +36,8 @@ const NewRoom = () => {
   },[ isAuthenticated ])
  
   const handleNewRoom = () => {
-    const room = createRandomRoom()
-    // const room = 'tt'
+    // const room = createRandomRoom()
+    const room = 'tt'
 
       if(isAuthenticated){
         localStorage.setItem('room', room)

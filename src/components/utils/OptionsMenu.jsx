@@ -6,7 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import GridViewIcon from '@mui/icons-material/GridView';
 
-const OptionsMenu = ({optionsOpen, openOptionsMenu,shareScreen,shareToogle,handleFullScreen,fullScreenToogle,setModalViews,setOptionsOpen}) => {
+const OptionsMenu = ({optionsOpen, openOptionsMenu,shareScreen,shareToogle,handleFullScreen,fullScreenToogle,setModalViews,setOptionsOpen,other}) => {
   return (
     <IconButton style={{backgroundColor: 'white'}}
                   id="basic-button2"
@@ -26,7 +26,7 @@ const OptionsMenu = ({optionsOpen, openOptionsMenu,shareScreen,shareToogle,handl
                         'aria-labelledby': 'basic-button2',
                       }}
                     >
-                      <MenuItem onClick={shareScreen}><IconButton style={{ backgroundColor: shareToogle ? 'red' : 'white'}} >{shareToogle ? <PresentToAllIcon /> : <CancelPresentationIcon />} <Typography> Share Screen</Typography></IconButton> </MenuItem>
+                      <MenuItem onClick={()=>shareScreen(other[0],other[1],other[2],other[3],other[4],other[5],other[6],other[7])}><IconButton style={{ backgroundColor: shareToogle ? 'red' : 'white'}} >{shareToogle ? <PresentToAllIcon /> : <CancelPresentationIcon />} <Typography> Share Screen</Typography></IconButton> </MenuItem>
                       <MenuItem onClick={handleFullScreen}><IconButton>{ fullScreenToogle ? <FullscreenExitIcon /> : <FullscreenIcon />} <Typography> Full Screen</Typography> </IconButton> </MenuItem>
                       <MenuItem onClick={() => setModalViews(true)}> <IconButton > <GridViewIcon /> <Typography> Change View </Typography></IconButton></MenuItem>
                     </Menu>

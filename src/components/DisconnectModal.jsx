@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
 
 
-const DisconnectModal = ({openModal, setOpenModal, disconnectAll, disconnect}) => {
+const DisconnectModal = ({openModal, setOpenModal, disconnectAll, disconnect, other}) => {
   return (
 
     <Modal
@@ -31,8 +31,8 @@ const DisconnectModal = ({openModal, setOpenModal, disconnectAll, disconnect}) =
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
               <Typography color="black"> You want to end the meeting? </Typography>
               <Box dense style={{display:'flex', gap: '5px'}}>
-                <Button size="small" onClick={disconnect}>Leave the room</Button>
-                <Button size="small" color="secondary" onClick={disconnectAll}>Finish for everyone</Button>
+                <Button size="small" onClick={() => disconnect(other[0],other[1])}>Leave the room</Button>
+                <Button size="small" color="secondary" onClick={() => disconnectAll(other[0],other[1], other[2])}>Finish for everyone</Button>
               </Box>
             </Typography>
           </Box>

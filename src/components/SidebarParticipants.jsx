@@ -31,7 +31,7 @@ const themeLight = createTheme({
   }
 });
 
-const SidebarParticipants = ({isOwner, openParticipants,setOpenParticipants,participants,removeParticipant,raiseHand,disableMics, micsOff}) => {
+const SidebarParticipants = ({isOwner, openParticipants,setOpenParticipants,participants,removeParticipant,raiseHand,disableMics, micsOff,other}) => {
 
   const [searchText, setSearchText] = useState("")
 
@@ -83,7 +83,7 @@ const SidebarParticipants = ({isOwner, openParticipants,setOpenParticipants,part
                         let data = JSON.parse(participant.identity)
                         return <>
                         <ListItem secondaryAction={
-                          JSON.parse(isOwner.localParticipant.identity).roomOwner && <IconButton onClick={() => removeParticipant(participant)} edge="end" aria-label="delete">
+                          JSON.parse(isOwner.localParticipant.identity).roomOwner && <IconButton onClick={() => removeParticipant(participant,other[0], other[1])} edge="end" aria-label="delete">
                             <RemoveCircleOutlineIcon />
                           </IconButton>
                         }>

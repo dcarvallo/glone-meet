@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material'
 import React from 'react'
 
-const NewParticipantDIalog = ({openModalParticipant,participant,newParticipant, acceptAll,rejectParticipant,acceptParticipant}) => {
+const NewParticipantDIalog = ({openModalParticipant,participant,newParticipant, acceptAll,rejectParticipant,acceptParticipant,other}) => {
   return (
     <Dialog
       style={{padding: '5px', margin:'2px'}}
@@ -21,7 +21,7 @@ const NewParticipantDIalog = ({openModalParticipant,participant,newParticipant, 
         <DialogActions>
           {newParticipant.length > 1 && <Button color="primary" onClick={acceptAll}>Accept All</Button> }
           <Button color="primary" onClick={() => rejectParticipant(participant)}>Reject</Button>
-          <Button color="secondary" onClick={() => acceptParticipant(participant)}>Accept</Button>
+          <Button color="secondary" onClick={() => acceptParticipant(participant,other[0],other[1],other[2],other[3],other[4])}>Accept</Button>
         </DialogActions>
       </Dialog>
             

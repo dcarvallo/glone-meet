@@ -1,46 +1,26 @@
 import {useState, useEffect, useRef} from 'react'
 import { useAuth0 } from '@auth0/auth0-react';
 import '../emojis.scss'
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Tooltip from '@mui/material/Tooltip';
-import Badge from '@mui/material/Badge';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
+import {Button,Typography,Tooltip,Badge,Grid,Stack,Box,IconButton,Backdrop, CircularProgress} from '@mui/material';
+import {Mic,Chat,Videocam,MicOff, VideocamOff,PhoneDisabled,People,TagFaces} from '@mui/icons-material';
 
-import {createLocalVideoTrack, createLocalAudioTrack, LocalVideoTrack } from 'twilio-video';
+import {createLocalVideoTrack } from 'twilio-video';
 import Video from 'twilio-video';
 import Participant from './Participant';
 import SideBar from './SideBar';
 import SidebarParticipants from './SidebarParticipants';
-import MicIcon from '@mui/icons-material/Mic';
-import ChatIcon from '@mui/icons-material/Chat';
-import VideocamIcon from '@mui/icons-material/Videocam';
-import MicOffIcon from '@mui/icons-material/MicOff';
-import VideocamOffIcon from '@mui/icons-material/VideocamOff';
-import IconButton from '@mui/material/IconButton';
-
-import PhoneDisabledIcon from '@mui/icons-material/PhoneDisabled';
-
-import PeopleIcon from '@mui/icons-material/People';
-
-import TagFacesIcon from '@mui/icons-material/TagFaces';
-
-import { getRoomToken } from "../scripts/getTokens";
-import { Backdrop, CircularProgress} from '@mui/material';
 import OptionsMenu from './utils/OptionsMenu';
 import EmojisMenu from './utils/EmojisMenu';
 import ChangeViewModal from './ChangeViewModal';
 import NewParticipantDialog from './NewParticipantDialog';
 import DisconnectModal from './DisconnectModal';
 import VideoLocal from './VideoLocal';
-import Clock from './utils/Clock'
+import {sendDataToRoom, disconnect, removeParticipant,connect,acceptParticipant,shareScreen, disconnectAll} from './utils/twilio-functions'
+
 
 const grids = [
   {id: 1, src: '//www.gstatic.com/meet/layout_v2_sidebar_8dea1e0cfa750f5b3dc5b666daf8178d.svg', selected: true},
   {id: 2, src: '//www.gstatic.com/meet/layout_v2_tiled_b81dc04cf1f16260f8dc9b727c03a14e.svg', selected: false},
-  // {id: 3, src: '//www.gstatic.com/meet/layout_v2_fullscreen_9175b2e94ac960de3a29a4c5e4c32ab6.svg', selected: false},
 ]
 const MainRoom = ({ roomOwner, roomName}) => {
   
@@ -96,7 +76,6 @@ const MainRoom = ({ roomOwner, roomName}) => {
     setVideoTrack(track2)
     track2.attach(localVideo.current)
     localVideo.current.style.transform = 'scale(-1, 1)'
-    
   }
 
   const handleSubmit = async () => {
@@ -104,7 +83,32 @@ const MainRoom = ({ roomOwner, roomName}) => {
     if (!username) return alert('Please login first')
   
     try {
-      await connect()
+      await connect(
+        otro,
+  token,
+  user,
+  roomOwner,
+  roomName,
+  setToken,
+  dataTrack,
+  setRaiseHand,
+  setEmojisUser,
+  setParticipants,
+  setIsConnected,
+  setVideoTrack,
+  localVideo,
+  addLocalVideo,
+  isConnected,
+  enterAudio,
+  setRoom,
+  Video,
+  setMicsOff,
+  setMicToogle,
+  createLocalVideoTrack,
+  micToogle,
+  setOpenModalParticipant,
+  setNewParticipant
+      )
     } catch (e) {
       console.error(e)
       localStorage.removeItem('room')
@@ -117,182 +121,10 @@ const MainRoom = ({ roomOwner, roomName}) => {
 
   function addLocalData() {
     const localDataTrack = new Video.LocalDataTrack();
-
     otro = localDataTrack
     setDataTrack(localDataTrack);
 };
-function sendDataToRoom(data){
   
-  const randomPosition =  Math.floor(Math.random() * 100) + 0.95 + '%'
-  !sendWait && dataTrack.send(JSON.stringify({
-      component: data,
-      user: user.name,
-      time: 3000,
-      position: randomPosition,
-      sid: room.localParticipant.sid
-    })); 
-    setSendWait(true)
-    setEmojisOpen({...emojisOpen, open: false})
-    setTimeout(() => {
-      setSendWait(false)
-    }, 3000)
-}
-
-  async function connect () {
-    // console.log(roomName)
-    let supToken
-    if(!token){
-      supToken = await getRoomToken({username: JSON.stringify({name: user.name, roomOwner: roomOwner}), roomName})
-      localStorage.setItem('twilio-token', supToken)
-      setToken(token)
-    }
-    else supToken = token
-    let room2 
-      //En prueba para validar si existe camara disponible
-      // navigator.getUserMedia({
-      //   video: {}
-      //   },
-      //   async () => {
-      //     room2 = await Video.connect(token)
-      //     room2.participants.forEach(participantConnected)
-      //     room2.on('participantConnected', participantConnected)
-      //     room2.on('participantDisconnected', participantDisconnected)
-      //     setRoom(room2)
-      // })
-
-      // room2 = await Video.connect(supToken,{video : false, dominantSpeaker: true})
-      room2 = await Video.connect(supToken, {dominantSpeaker: true})
-      setRoom(room2)
-      room2.localParticipant.publishTrack(otro);
-      room2.on('participantConnected',participantConnected)
-      room2.on('dominantSpeakerChanged', dominantParticipant);
-      room2.on('participantDisconnected', participantDisconnected)
-      room2.on('disconnected', () => {
-        localStorage.removeItem('room')
-        localStorage.removeItem('twilio-token')
-        window.location.reload()
-      });
-
-      const dataTrackPublished = {};
-
-      dataTrackPublished.promise = new Promise((resolve, reject) => {
-        dataTrackPublished.resolve = resolve;
-        dataTrackPublished.reject = reject;
-      });
-
-      room2.localParticipant.on('trackPublished', publication => {
-        if (publication.track === dataTrack) {
-          dataTrackPublished.resolve();
-        }
-      });
-
-      room2.localParticipant.on('trackPublicationFailed', (error, track) => {
-        if (track === dataTrack) {
-          dataTrackPublished.reject(error);
-        }
-      });
-
-      room2.on('trackSubscribed', track => {
-      
-        if (track.kind === 'data') {
-          track.on('message', async data => {
-            let temp = JSON.parse(data)
-            
-            if(temp.personalMic){
-              setMicsOff(prev => prev.includes(temp.sid) ?  prev.filter(el => el !== temp.sid) : [...prev, temp.sid])
-            }
-            if(temp.disableMics){
-              setMicToogle(!micToogle)
-              room2.localParticipant.audioTracks.forEach(track2 => {
-                micToogle ? track2.track.disable() : track2.track.enable()
-              });
-              return
-            }
-            if(!temp.connect){
-              if(temp.component === 'hand'){
-                setRaiseHand(prev => prev.includes(temp.sid) ?  prev.filter(el => el !== temp.sid) : [...prev, temp.sid] )
-                return
-              }
-              setEmojisUser(prev => [...prev, temp])
-            }
-            else{
-              
-              if(isConnected){
-                let arrParticipants = []
-                room2.participants.forEach(participant => {
-                  arrParticipants.push(participant)
-                })
-                setParticipants(...arrParticipants,...arrParticipants,...arrParticipants,...arrParticipants,...arrParticipants,...arrParticipants)
-              }
-
-              if(room2.localParticipant.sid == temp.sid){
-                let arrParticipants = []
-                room2.participants.forEach(participant => {
-                  arrParticipants.push(participant)
-                })
-                setParticipants(arrParticipants)
-                setIsConnected(true)  
-                const track2 = await createLocalVideoTrack()
-                setVideoTrack(track2)
-                track2.attach(localVideo.current)
-                localVideo.current.style.transform = 'scale(-1, 1)'
-              }
-            }           
-          });
-        }
-      });
-      
-      addLocalVideo()
-      JSON.parse(room2.localParticipant.identity).roomOwner && setIsConnected(true)
-      isConnected && enterAudio.current.play();
-  }
-  
-   function disconnect () {
-    leaveAudio.current && leaveAudio.current.play();
-    setTimeout(() => {
-      localStorage.removeItem('room')
-      localStorage.removeItem('twilio-token')
-      room.disconnect();
-      window.location.reload()
-    },1000)
-  }
-  
-  function dominantParticipant(participant){
-    // console.log('este es el participante dominante(Audio)', participant) 
-  }
-  
-  function participantConnected (participant) {
-
-    let usdata = JSON.parse(participant.identity)
-    if(!usdata.name.includes('(share)')){
-
-      roomOwner && setOpenModalParticipant(true)
-      if(usdata.roomOwner) {
-        setParticipants(prev => [...prev, participant])
-      }
-      setNewParticipant(prev => [...prev, participant])
-    }
-    else acceptParticipant(participant)
-  }
-
-  function acceptParticipant(participant) {
-      enterAudio.current.play();
-      const localDataTrack = new Video.LocalDataTrack();
-      if(dataTrack){
-        dataTrack.send(JSON.stringify({
-          connect: true,
-          sid: participant.sid
-        }));
-      }else {
-        localDataTrack.send(JSON.stringify({
-          connect: true,
-          sid: participant.sid
-        }));
-      }
-      setParticipants(prev => [...prev, participant])
-      setNewParticipant(prevParticipants => prevParticipants.filter((p) => p !== participant))
-  }
-
   function acceptAll(){
     let all = []
     let deleteNew = [...newParticipant]
@@ -307,14 +139,8 @@ function sendDataToRoom(data){
     setNewParticipant([])
   }
 
-  function participantDisconnected (participant) {
-    setParticipants((prevParticipants) =>
-      prevParticipants.filter((p) => p !== participant)
-    );
-  }
-
   function rejectParticipant() {
-    removeParticipant(newParticipant[0])
+    removeParticipant(newParticipant[0], roomName, setParticipants)
     setOpenModalParticipant(false)
   }
 
@@ -322,54 +148,6 @@ function sendDataToRoom(data){
     dataTrack.send(JSON.stringify({
       disableMics: true,
     }));
-  }
-
-  async function shareScreen(){
-    let screenTrack
-    let room2 
-    navigator.mediaDevices.getDisplayMedia().then( async (stream) => {
-      screenTrack = new Video.LocalVideoTrack(stream.getTracks()[0]);
-      room2 = room.localParticipant.publishTrack(screenTrack);
-      let token = await getRoomToken({username: JSON.stringify({name: user.name + ' (share)', roomOwner: false}), roomName})
-      Video.connect(token, {dominantSpeaker: true, tracks: [screenTrack]})
-      enterAudio.current.play();
-      let participant
-      screenTrack.once('stopped', async (track) => {
-        room.participants.forEach(participant2 => {
-         participant2.videoTracks.forEach(tra => {
-           if(tra.trackName == track.id ){ 
-           participant = participant2
-          } })
-        })
-        removeParticipant(participant)
-      }); 
-      setOptionsOpen({...optionsOpen, open: false})
-
-  }).catch(() => {
-      alert('Could not share the screen.')
-  });
-
-  }
-  async function removeParticipant(participant){
-    
-    try {
-      await fetch('/removeParticipant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'roomName': roomName,
-          'participantSid': participant.sid
-        })
-      });
-  
-      setParticipants((prevParticipants) =>
-      prevParticipants.filter((p) => p !== participant)
-      );
-    } catch (error) {
-      console.log(error)
-    }
   }
 
   function handleVideo(){
@@ -400,7 +178,7 @@ function sendDataToRoom(data){
   }
 
   function handleDisconnect() {
-    JSON.parse(room.localParticipant.identity).roomOwner ? setOpenModal(true) : disconnect()
+    JSON.parse(room.localParticipant.identity).roomOwner ? setOpenModal(true) : disconnect(leaveAudio,room)
   }
 
   function showChats(){
@@ -408,27 +186,9 @@ function sendDataToRoom(data){
     setShowBadge(true)
   }
 
-  async function disconnectAll() {
-    try {
-      const response = await fetch('/roomDisconnect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'roomName': roomName,
-        })
-      });
-      disconnect();
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  function handleFullScreen(){
+  function handleFullScreen(vidref){
     setFullScreenToogle(prev => !prev)
-    console.log(fullScreenToogle)
-    console.log(document.fullscreenElement)
+    mainDiv.current = vidref
     fullScreenToogle && document.fullscreenElement ? document.exitFullscreen() : mainDiv.current.requestFullscreen()
     setOptionsOpen({...optionsOpen, open: false})
   }
@@ -443,8 +203,8 @@ function sendDataToRoom(data){
     track2.attach(localVideo.current)
     localVideo.current.style.transform = 'scale(-1, 1)'
   }
-  function selectParticipant(id){
-    handleFullScreen()
+  function selectParticipant(vidref){
+    handleFullScreen(vidref)
   }
 
   function openEmojisMenu(event){
@@ -463,8 +223,8 @@ function sendDataToRoom(data){
   }
   
   return (
-    
-    isConnected ? 
+    <>
+    <div  ref={mainDiv}></div>
      <Box style={{height: '100vh'}}>
       <audio ref={enterAudio} src='https://www.gstatic.com/meet/sounds/join_call_6a6a67d6bcc7a4e373ed40fdeff3930a.ogg'></audio>
       <audio ref={leaveAudio} src='https://www.gstatic.com/meet/sounds/leave_call_bfab46cf473a2e5d474c1b71ccf843a1.ogg'></audio>
@@ -492,12 +252,9 @@ function sendDataToRoom(data){
         <Stack direction={{ xs: 'row', sm: 'column' }} style={{ maxHeight: '92vh',overflow: 'auto'}} spacing={2}> 
           {participants.length > 0 &&
             participants.map(participant =>  (
-              // <div ref={selectedParticipantRef}>
-              <div  ref={mainDiv}>
-
+              <div >
               <Participant 
-              fullScreenToogle={fullScreenToogle}
-              selectParticipant={selectParticipant}
+              ref={mainDiv}
               style={{cursor: 'pointer'}}
               key={participant.sid}
               participant={participant}
@@ -506,7 +263,6 @@ function sendDataToRoom(data){
               width='250px'
               />
               </div>
-              // </div>
               ))
             }
         </Stack>
@@ -521,18 +277,13 @@ function sendDataToRoom(data){
     setOpenParticipants={setOpenParticipants} 
     disableMics={disableMics}
     micsOff={micsOff}
+    other={[roomName, setParticipants]}
     /> 
-
   </Grid>
   }
-
   { gridViewSelected === 2 && 
     <Grid container spacing={2} padding={2}>
                <Grid item gap={2} md={3}>
-                {/* <div style={{position:'relative', borderRadius: '10px', backgroundColor: "#585858", padding: '4px 4px 0 3px'}} sx={{width: '200px'}}>
-                  <video onDoubleClick={handleFullScreen} ref={localVideo} style={{ height:"150px", width: '100%', objectFit: "cover", borderRadius:"10px", position: 'relatve'}} autoPlay={true} />
-                  <p style={{position: 'absolute', left: '5px', bottom: '-8px', zIndex:'9'}} >{user.name}</p>
-                </div> */}
                 <Box style={{position:'relative', borderRadius: '10px', backgroundColor: "#585858", padding: '4px 4px 0 3px'}} sx={{width: '250px'}}>
       
                 <VideoLocal 
@@ -553,18 +304,16 @@ function sendDataToRoom(data){
               participants.map(participant =>  (
                 
                 <Grid item gap={2} md={3}>
-                  <div  ref={mainDiv}>
-
+                  
                 <Participant
-                  selectParticipant={selectParticipant}
+                  // selectParticipant={selectParticipant}
                   style={{cursor: 'pointer'}}
                   key={participant.sid}
                   participant={participant}
                   raiseHand={raiseHand}
                   micsOff={micsOff}
                   />
-                  </div>
-                
+                  
                 </Grid>
                   ))
                 }
@@ -573,17 +322,18 @@ function sendDataToRoom(data){
 
 {room && isConnected && 
     <div  style={{ width:'100%', display: 'flex', justifyContent: 'center', gap: '7px', position: 'relative', margin: '0 auto'}}>
-    <Tooltip title="Audio On/Off"><IconButton style={micToogle ? {backgroundColor: 'white'} : {backgroundColor: 'red'}} onClick={handleMic}>{micToogle ? <MicIcon /> : <MicOffIcon />}</IconButton></Tooltip>
-    <Tooltip title="Video On/Off"><IconButton style={videoToogle ? {backgroundColor: 'white'} : {backgroundColor: 'red'}} onClick={handleVideo}>{videoToogle ? <VideocamIcon /> : <VideocamOffIcon />}</IconButton></Tooltip>
-    <Tooltip title="Disconnect"><IconButton style={{backgroundColor: 'red'}} onClick={handleDisconnect}><PhoneDisabledIcon /></IconButton></Tooltip>
+    <Tooltip title="Audio On/Off"><IconButton style={micToogle ? {backgroundColor: 'white'} : {backgroundColor: 'red'}} onClick={handleMic}>{micToogle ? <Mic /> : <MicOff />}</IconButton></Tooltip>
+    <Tooltip title="Video On/Off"><IconButton style={videoToogle ? {backgroundColor: 'white'} : {backgroundColor: 'red'}} onClick={handleVideo}>{videoToogle ? <Videocam /> : <VideocamOff />}</IconButton></Tooltip>
+    <Tooltip title="Disconnect"><IconButton style={{backgroundColor: 'red'}} onClick={handleDisconnect}><PhoneDisabled /></IconButton></Tooltip>
     { sendWait ? 
-      <IconButton style={{backgroundColor: 'grey'}}><TagFacesIcon /></IconButton>
+      <IconButton style={{backgroundColor: 'grey'}}><TagFaces /></IconButton>
     :
       <EmojisMenu 
       emojisOpen={emojisOpen}
       openEmojisMenu={openEmojisMenu}
       setEmojisOpen={setEmojisOpen}
       sendDataToRoom={sendDataToRoom}
+      other={[sendWait,dataTrack,user,room,setSendWait, setEmojisOpen,emojisOpen]}
       />
     }
     <OptionsMenu
@@ -595,6 +345,7 @@ function sendDataToRoom(data){
       fullScreenToogle={fullScreenToogle}
       setModalViews={setModalViews}
       setOptionsOpen={setOptionsOpen}
+      other={[Video,user,roomName,enterAudio,room,setOptionsOpen,optionsOpen,setParticipants]}
     />
   </div> }
   <Box style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
@@ -604,8 +355,8 @@ function sendDataToRoom(data){
     </Box>
     {/* <Clock /> */}
     <Box style={{display: 'flex', gap: '7px', marginRight:'15px'}}>
-      <Tooltip title="Chat"><IconButton style={{backgroundColor: 'white'}} onClick={showChats}><Badge color="primary" variant="dot" badgeContent=" " invisible={showBadge} ><ChatIcon /></Badge></IconButton></Tooltip>
-      <Tooltip title="Participants"><IconButton style={{backgroundColor: 'white'}} onClick={() => setOpenParticipants(true)}>{ <PeopleIcon />}</IconButton></Tooltip>
+      <Tooltip title="Chat"><IconButton style={{backgroundColor: 'white'}} onClick={showChats}><Badge color="primary" variant="dot" badgeContent=" " invisible={showBadge} ><Chat /></Badge></IconButton></Tooltip>
+      <Tooltip title="Participants"><IconButton style={{backgroundColor: 'white'}} onClick={() => setOpenParticipants(true)}>{ <People />}</IconButton></Tooltip>
     </Box>
   </Box>
 
@@ -618,6 +369,7 @@ function sendDataToRoom(data){
         rejectParticipant={rejectParticipant}
         acceptParticipant={acceptParticipant}
         newParticipant={newParticipant}
+        other={[enterAudio,Video,dataTrack,setParticipants,setNewParticipant]}
       />
     ))
   }
@@ -626,6 +378,7 @@ function sendDataToRoom(data){
     setOpenModal={setOpenModal}
     disconnectAll={disconnectAll}
     disconnect={disconnect}
+    other={[leaveAudio,room,roomName]}
   />
   <ChangeViewModal gridView={gridView} openModal={modalViews} setOpenModal={setModalViews} changeView={changeView} />
 
@@ -638,10 +391,14 @@ function sendDataToRoom(data){
       >
         <CircularProgress color="inherit" />
         Loading... Please wait while you are allowed to enter.
-        <Button variant='contained' onClick={disconnect}>Exit</Button>
+        <Button variant='contained' onClick={() => disconnect(leaveAudio,room)}>Exit</Button>
       </Backdrop>
     </Box>
+
+    </>
   );
+
+  
 };
 
 export default MainRoom

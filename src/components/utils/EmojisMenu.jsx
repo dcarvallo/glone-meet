@@ -12,7 +12,7 @@ const reactions = [
   {name:'hand', component: <PanToolIcon />}
 ]
 
-const EmojisMenu = ({emojisOpen,openEmojisMenu,setEmojisOpen,sendDataToRoom}) => {
+const EmojisMenu = ({emojisOpen,openEmojisMenu,setEmojisOpen,sendDataToRoom, other}) => {
   return (
    
     <IconButton style={{backgroundColor: 'yellow'}}
@@ -35,7 +35,7 @@ const EmojisMenu = ({emojisOpen,openEmojisMenu,setEmojisOpen,sendDataToRoom}) =>
         >
           <Box style={{display: 'flex'}}>
             {reactions.map(reaction => (
-              <MenuItem onClick={() => sendDataToRoom(reaction.name)}><IconButton style={{backgroundColor: 'black', color: 'yellow'}}>{reaction.component}</IconButton></MenuItem>
+              <MenuItem onClick={() => sendDataToRoom(reaction.name, other[0],other[1],other[2],other[3],other[4], other[5],other[6])}><IconButton style={{backgroundColor: 'black', color: 'yellow'}}>{reaction.component}</IconButton></MenuItem>
             ))}
           {/* <MenuItem onClick={() => sendDataToRoom('smile')}><IconButton style={{backgroundColor: 'black',color: 'yellow'}}></IconButton></MenuItem>
           <MenuItem onClick={() => sendDataToRoom('sad')}><IconButton style={{backgroundColor: 'black',color: 'yellow'}}><SentimentVeryDissatisfiedIcon /></IconButton></MenuItem>
